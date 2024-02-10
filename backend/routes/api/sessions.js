@@ -8,10 +8,24 @@ const { User } = require('../../db/models');
 
 const router = express.Router();
 
+// Restore session user
+router.get('/', (req, res) => {
+    const { user } = req;
+    if (user) {
+      const safeUser = {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+      };
+      return res.json({
+        user: safeUser
+      });
+    } else return res.json({ user: null });
+  }
+);
+
 // Log in
-router.post(
-    '/',
-    async (req, res, next) => {
+router.post('/', async (req, res, next) => {
       const { credential, password } = req.body;
 
       const user = await User.unscoped().findOne({
@@ -45,9 +59,7 @@ router.post(
     }
   );
 
-  router.delete(
-    '/',
-    (_req, res) => {
+  router.delete('/', (_req, res) => {
       res.clearCookie('token');
       return res.json({ message: 'success' });
     }
