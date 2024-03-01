@@ -5,7 +5,7 @@ const { requireAuth } = require('../../utils/auth');
 
 
 // Get all reviews for a spot by spot ID
-router.get('/:spotID', async (req,res) => {
+router.get('/spots/:spotId/reviews', async (req,res) => {
     const { spotId } = req.params;
 
     const reviews = await Review.findAll({

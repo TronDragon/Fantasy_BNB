@@ -8,15 +8,15 @@ const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-
-router.get('/', async (req, res) => {
+//get all spots
+router.get('/spots', async (req, res) => {
     const spots = await Spot.findAll();
 
     return res.json({ spots  });
 })
 
-
-router.post('/:spotId/images', requireAuth, upload.single('image'),
+//add an image to a spots based on the spots id
+router.post('/spots/:spotId/images', requireAuth, upload.single('image'),
 async(req, res, next) => {
     const { spotId } = req.params;
 
@@ -41,7 +41,7 @@ async(req, res, next) => {
 })
 
 // create new spot
-router.post('/', requireAuth, async (req,res,next) => {
+router.post('/spots', requireAuth, async (req,res,next) => {
     const { title, description, price, imageUrl, userId } = req.body;
 
     const newSpot = await Spot.create({
@@ -81,7 +81,7 @@ router.post('/:spotId/add', requireAuth, async (req, res, next) => {
 })
 
 //delete a spot
-router.delete('/:spotId/delete', requireAuth, async (req,res,next) => {
+router.delete('/spots/:spotId', requireAuth, async (req,res,next) => {
     const { spotId } = req.params;
     const { userId } = req.body;
 
@@ -98,7 +98,7 @@ router.delete('/:spotId/delete', requireAuth, async (req,res,next) => {
 })
 
 //get spots by user's id
-router.get('/user/:userId', requireAuth, async (req,res,next) => {
+router.get('/spots/current', requireAuth, async (req,res,next) => {
     const { userId } = req.params;
 
     const user = await User.findByPk(userId, {
@@ -117,7 +117,7 @@ router.get('/user/:userId', requireAuth, async (req,res,next) => {
 })
 
 //edit a spot
-router.put('/:spotId/edit', requireAuth, async (req,res,next) => {
+router.patch('/spots/:spotId', requireAuth, async (req,res,next) => {
     const { spotId } = req.params;
     const { title, description, price, imageUrl } = req.body;
 
@@ -145,7 +145,7 @@ router.put('/:spotId/edit', requireAuth, async (req,res,next) => {
 })
 
 //delete an image for a spot
-router.delete('/:spotId/images/:imageId/delete', requireAuth, async (res,req,next) => {
+router.delete('/spots/:spotId/images/:imageId/', requireAuth, async (res,req,next) => {
     const { spotId, imageId } = req.params;
 
     const spot = await Spot.findByPk(spotId);
@@ -175,7 +175,7 @@ router.delete('/:spotId/images/:imageId/delete', requireAuth, async (res,req,nex
 })
 
 //get details for a spot from an id
-router.get('/:spotId', async (req,res,next) => {
+router.get('/spots/:spotId', async (req,res,next) => {
     const { spotId } = req.params;
 
     const spot = await Spot.findByPk(spotId, {
