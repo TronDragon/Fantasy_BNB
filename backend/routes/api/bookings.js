@@ -109,7 +109,7 @@ router.post('/spots/:spotId/bookings', requireAuth, async (req,res) => {
         endDate,
         createdAt: newBooking.createdAt,
         updatedAt: newBooking.updatedAt
-     });
+    });
 })
 
 //edit a booking
@@ -169,7 +169,7 @@ router.put('/bookings/:bookingId', requireAuth, async (req,res) => {
         endDate: booking.endDate,
         createdAt: booking.createdAt,
         updatedAt: booking.updatedAt,
-     });
+    });
 });
 
 //delete a booking
