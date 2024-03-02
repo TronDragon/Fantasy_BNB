@@ -10,30 +10,75 @@ const upload = multer({ storage: storage });
 
 //get all spots
 router.get('/spots', async (req, res) => {
-    const spots = await Spot.findAll();
+    //get parameters
+    const { page = 1, size = 20, minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query;
 
-    return res.json({ spots  });
+    //validate parameters
+    if(page < 1 || size < 1 || minPrice < 0 || maxPrice < 0){
+        return res.status(400).json({
+            message: 'Bad Request',
+            errors: {
+                page: "Page must be greater than or equal to 1",
+                size: "Size must be greater than or equal to 1",
+                maxLat: "Maximum latitude is invalid",
+                minLat: "Minimum latitude is invalid",
+                minLng: "Maximum longitude is invalid",
+                maxLng: "Minimum longitude is invalid",
+                minPrice: "Minimum price must be greater than or equal to 0",
+                maxPrice: "Maximum price must be greater than or equal to 0"
+            }
+        })
+    }
+    const queryOptions = {
+        offset: (page - 1) * size,
+        limit: size,
+        where: {
+            lat: { [Op.between]: [minLat, maxLat] },
+            lng: { [Op.between]: [minLng, maxLng] },
+            price: { [Op.between]: [minPrice, maxPrice] },
+        },
+        include: [
+            {
+                model: SpotImage,
+                as: 'images',
+                where: { preview: true },
+                required: false,
+            }
+        ]
+    }
+    const spots = await Spot.findAll(queryOptions);
+
+    return res.json({
+        Spots: spots,
+        page: parseInt(page),
+        size: parseInt(size)
+     });
 })
 
 //add an image to a spots based on the spots id
 router.post('/spots/:spotId/images', requireAuth, upload.single('image'),
 async(req, res, next) => {
     const { spotId } = req.params;
+    const { url, preview } = req.body;
 
     //validate that the spot with spotId exists
     const spot = await Spot.findByPk(spotId);
     if(!spot) {
-        const error = new Error('Spot not found');
+        const error = new Error('Spot couldn'/'t be found');
         error.status = 404;
         throw error;
     }
-
-    //handle file upload and associate the image with the spot
-    const imageBuffer = req.file.buffer;
+    //require proper authorization
+    if(spot.ownerID !== req.user.id){
+        const error = new Error('User does not own this spot')
+        error.status = 403;
+        throw error;
+    }
     //save image to the database
     const newImage = await SpotImage.create({
         spotId: spot.id,
-        data: imageBuffer,
+        url,
+        preview,
     });
 
     //return info about the added image
@@ -42,16 +87,23 @@ async(req, res, next) => {
 
 // create new spot
 router.post('/spots', requireAuth, async (req,res,next) => {
-    const { title, description, price, imageUrl, userId } = req.body;
+    const {
+        address, city, state, country, latitude,
+        longitude, name, description, price
+            } = req.body;
 
     const newSpot = await Spot.create({
-        title,
+        address,
+        city,
+        state,
+        country,
+        latitude,
+        longitude,
+        name,
         description,
         price,
-        imageUrl,
-        userId,
     })
-    return res.json({ spot: newSpot });
+    return res.status(201).json({ spot: newSpot });
 });
 
 //add a spot to the user's spots
@@ -119,7 +171,8 @@ router.get('/spots/current', requireAuth, async (req,res,next) => {
 //edit a spot
 router.patch('/spots/:spotId', requireAuth, async (req,res,next) => {
     const { spotId } = req.params;
-    const { title, description, price, imageUrl } = req.body;
+    const { address, city, state, country, latitude,
+        longitude, name, description, price } = req.body;
 
     const spot = await Spot.findByPk(spotId);
 
@@ -128,16 +181,21 @@ router.patch('/spots/:spotId', requireAuth, async (req,res,next) => {
         error.status = 404;
         throw error;
     }
-    if(spot.userId !== req.user.id) {
+    if(spot.ownerID !== req.user.id) {
         const error = new Error('User does not own the spot');
         error.status = 403;
         throw error;
     }
     //update time
-    spot.title = title || spot.title;
+    spot.address = address || spot.address;
+    spot.city = city || spot.city;
+    spot.state = state || spot.state;
+    spot.country = country || spot.country;
+    spot.latitude = latitude || spot.latitude;
+    spot.longitude = longitude || spot.longitude;
+    spot.name = name || spot.name;
     spot.description = description || spot.description;
     spot.price = price || spot.price;
-    spot.imageUrl = imageUrl || spot.imageUrl;
 
     await spot.save();
 
@@ -145,33 +203,25 @@ router.patch('/spots/:spotId', requireAuth, async (req,res,next) => {
 })
 
 //delete an image for a spot
-router.delete('/spots/:spotId/images/:imageId/', requireAuth, async (res,req,next) => {
-    const { spotId, imageId } = req.params;
+router.delete('/spot-images/:imageId', requireAuth, async (res,req,next) => {
+    const { imageId } = req.params;
+    const { userId } = req.user;
 
-    const spot = await Spot.findByPk(spotId);
-    if(!spot){
-        const error = new Error('Spot not found');
-        error.status = 404;
-        throw error;
-    }
-    //check if the user owns the spot
-    if(spot.userId !== req.user.id){
-        const error = new Error('User does not own the spot');
-        error.status = 404;
-        throw error;
-    }
+    const spotImage = await SpotImage.findByPk(imageId, {
+        include: {
+            model: Spot,
+            where: { ownerID: userId },
+        },
+    })
 
-    const image = await SpotImage.findByPk(imageId);
-    if(!image || image.spotId !== spot.id){
-        const error = new Error('Image not found for the spot');
-        error.status = 404;
-        throw error;
-    }
+    if(!spotImage){
+        return res.status(404).json({ message: "Spot Image couldn't be found" })
+    };
 
-    //delete the image from the database
-    await image.destroy();
+    //delete the image
+    await spotImage.destroy();
 
-    return res.json({ message: 'Image deleted' });
+    return res.json({ message: "Successfully deleted" })
 })
 
 //get details for a spot from an id
