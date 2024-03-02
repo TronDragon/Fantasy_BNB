@@ -7,13 +7,13 @@ module.exports = {
       {
         userId: 1,
         spotId: 1,
-        comment: 'A time was had',
+        content: 'A time was had',
         rating: 3,
       }
     ])
   },
 
   async down (queryInterface, Sequelize) {
-    return queryInterface.bulkDelete('Reviews', null, {});
+    return queryInterface.bulkDelete('Review', null, {});
   }
 };

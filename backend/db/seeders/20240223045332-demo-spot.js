@@ -67,7 +67,7 @@ module.exports = {
       },
       {
         ownerId: 6,
-        address: 'Ul'/'dah',
+        address: "Ul'dah",
         city: 'Thanalan',
         state: 'Eorzea',
         country: 'Hydaelyn',
