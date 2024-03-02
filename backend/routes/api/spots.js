@@ -64,7 +64,7 @@ async(req, res, next) => {
     //validate that the spot with spotId exists
     const spot = await Spot.findByPk(spotId);
     if(!spot) {
-        const error = new Error('Spot couldn'/'t be found');
+        const error = new Error("Spot couldn't be found");
         error.status = 404;
         throw error;
     }
@@ -106,31 +106,31 @@ router.post('/spots', requireAuth, async (req,res,next) => {
     return res.status(201).json({ spot: newSpot });
 });
 
-//add a spot to the user's spots
-router.post('/:spotId/add', requireAuth, async (req, res, next) => {
-    const { spotId } = req.params;
-    const { userId } = req.body;
+// //add a spot to the user's spots
+// router.post('/:spotId/add', requireAuth, async (req, res, next) => {
+//     const { spotId } = req.params;
+//     const { userId } = req.body;
 
-    // check if the user owns the spot
-    const spot = await Spot.findByPk(spotId);
-    if(!spot || spot.userId !== userId) {
-        const error = new Error('User does not own the spot');
-        error.status = 403;
-        throw error;
-    }
+//     // check if the user owns the spot
+//     const spot = await Spot.findByPk(spotId);
+//     if(!spot || spot.userId !== userId) {
+//         const error = new Error('User does not own the spot');
+//         error.status = 403;
+//         throw error;
+//     }
 
-    const user = await User.findByPk(userId);
-    if(user){
-        //add spotId to user's spots
-        user.spots.push(spotId);
-        await user.save();
-    } else {
-        const error = new Error('User not found');
-        error.status = 404;
-        throw error
-    }
-    return res.json({ message: 'Spot added to user' });
-})
+//     const user = await User.findByPk(userId);
+//     if(user){
+//         //add spotId to user's spots
+//         user.spots.push(spotId);
+//         await user.save();
+//     } else {
+//         const error = new Error('User not found');
+//         error.status = 404;
+//         throw error
+//     }
+//     return res.json({ message: 'Spot added to user' });
+// })
 
 //delete a spot
 router.delete('/spots/:spotId', requireAuth, async (req,res,next) => {
