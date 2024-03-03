@@ -1,8 +1,14 @@
 'use strict';
 
+let options = {};
+if (process.env.NODE_ENV === 'production') {
+  options.schema = process.env.SCHEMA;  // define your schema in options object
+}
+
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Reviews', {
+    options.tableName = 'Reviews';
+    await Review.bulkCreate([ {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -30,9 +36,10 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       }
-    });
+    }]);
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Reviews');
+    options.tableName = 'Reviews';
+    return queryInterface.bulkDelete(options);
   }
 };

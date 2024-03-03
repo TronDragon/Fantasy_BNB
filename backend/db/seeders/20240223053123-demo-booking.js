@@ -2,6 +2,11 @@
 
 const { Booking } = require('../models');
 
+let options = {};
+if (process.env.NODE_ENV === 'production') {
+  options.schema = process.env.SCHEMA;  // define your schema in options object
+}
+
 module.exports = {
   async up (queryInterface, Sequelize) {
     await Booking.bulkCreate([
@@ -14,7 +19,8 @@ module.exports = {
     ])
   },
 
-  async down (queryInterface, Sequelize) {
-    return queryInterface.bulkDelete('Bookings', null, {});
+  async down(queryInterface, Sequelize) {
+    options.tableName = 'Bookings';
+    return queryInterface.bulkDelete(options, null, {});
   }
 };
