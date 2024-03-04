@@ -21,6 +21,8 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     options.tableName = 'Bookings';
-    return queryInterface.bulkDelete(options, null, {});
+    return Booking.destroy({
+      where: {},
+    });
   }
 };
