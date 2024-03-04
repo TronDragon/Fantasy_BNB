@@ -7,8 +7,8 @@ if (process.env.NODE_ENV === 'production') {
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    options.tableName = 'SpotImages';
-    await SpotImage.bulkCreate([ {
+    // options.tableName = 'SpotImages';
+    await queryInterface.createTable('SpotImage', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -32,7 +32,7 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       }
-    }]);
+    },options);
   },
   async down(queryInterface, Sequelize) {
     return queryInterface.bulkDelete('SpotImages', null, {});

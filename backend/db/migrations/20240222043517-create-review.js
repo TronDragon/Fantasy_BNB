@@ -7,8 +7,8 @@ if (process.env.NODE_ENV === 'production') {
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    options.tableName = 'Reviews';
-    await Review.bulkCreate([ {
+    // options.tableName = 'Reviews';
+    await queryInterface.createTable('Reviews', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -36,7 +36,7 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       }
-    }]);
+    }, options);
   },
   async down(queryInterface, Sequelize) {
     options.tableName = 'Reviews';

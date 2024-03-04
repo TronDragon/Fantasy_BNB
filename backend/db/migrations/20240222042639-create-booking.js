@@ -7,8 +7,8 @@ if (process.env.NODE_ENV === 'production') {
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    options.tableName = 'Bookings';
-    await Booking.bulkCreate([{
+    // options.tableName = 'Bookings';
+    await queryInterface.createTable('Bookings' ,{
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -35,7 +35,7 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       }
-    }]);
+    }, options);
   },
   async down(queryInterface, Sequelize) {
     options.tableName = 'Bookings';
