@@ -15,7 +15,8 @@ module.exports = {
         content: 'A time was had',
         rating: 3,
       }
-    ])
+    ]),
+    { validate: true }
   },
 
   async down (queryInterface, Sequelize) {

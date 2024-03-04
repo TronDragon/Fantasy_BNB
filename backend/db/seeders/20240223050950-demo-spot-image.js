@@ -15,7 +15,8 @@ module.exports = {
         url: 'https://example_image',
         preview: true,
       }
-    ])
+    ]),
+    { validate: true }
   },
 
   async down(queryInterface, Sequelize) {

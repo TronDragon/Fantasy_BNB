@@ -82,7 +82,8 @@ module.exports = {
         longitude: -46.63,
         price: 75,
       },
-    ])
+    ]),
+    { validate: true }
   },
 
   async down (queryInterface, Sequelize) {
