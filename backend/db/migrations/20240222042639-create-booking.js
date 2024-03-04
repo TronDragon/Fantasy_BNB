@@ -38,8 +38,8 @@ module.exports = {
     }, options);
   },
   async down(queryInterface, Sequelize) {
-    options.tableName = 'Bookings';
-    const Op = Sequelize.Op;
-    return queryInterface.bulkDelete(options);
+    // options.tableName = 'Bookings';
+    // const Op = Sequelize.Op;
+    return queryInterface.dropTable('Bookings',options);
   }
 };

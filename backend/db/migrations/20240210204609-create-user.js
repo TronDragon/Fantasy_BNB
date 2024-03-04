@@ -17,12 +17,10 @@ module.exports = {
       firstName: {
         type: Sequelize.STRING(30),
         allowNull:false,
-
       },
       lastName: {
         type: Sequelize.STRING(30),
         allowNull:false,
-
       },
       username: {
         type: Sequelize.STRING(30),
@@ -52,8 +50,8 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    options.tableName = "Users";
-    const Op = Sequelize.Op;
-    return queryInterface.dropTable(options);
+    // options.tableName = "Users";
+    // const Op = Sequelize.Op;
+    return queryInterface.dropTable('Users',options);
   }
 };
