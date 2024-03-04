@@ -5,9 +5,9 @@ if (process.env.NODE_ENV === 'production') {
   options.schema = process.env.SCHEMA;  // define your schema in options object
 }
 
+options.tableName = 'SpotImages';
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // options.tableName = 'SpotImages';
     return queryInterface.createTable('SpotImage', {
       id: {
         allowNull: false,
